@@ -57,6 +57,7 @@ import static android.support.v4.app.NotificationManagerCompat.IMPORTANCE_HIGH;
 import static de.appplant.cordova.plugin.notification.Notification.PREF_KEY_ID;
 import static de.appplant.cordova.plugin.notification.Notification.Type.TRIGGERED;
 import de.appplant.cordova.plugin.notification.Options;
+import de.appplant.cordova.plugin.notification.util.AssetUtil;
 
 /**
  * Central way to access all or single local notifications set by specific
@@ -72,6 +73,9 @@ public final class Manager {
     // The application context
     private Context context;
 
+    // Asset util instance
+    private final AssetUtil assets;
+
     /**
      * Constructor
      *
@@ -80,6 +84,7 @@ public final class Manager {
     private Manager(Context context) {
         this.context = context;
         //createDefaultChannel();
+        assets = AssetUtil.getInstance(context);
     }
 
     /**
@@ -113,7 +118,7 @@ public final class Manager {
         return toast;
     }
 
-    /**
+     /**
      * TODO: temporary
      */
     @SuppressLint("WrongConstant")
@@ -126,8 +131,10 @@ public final class Manager {
 
         NotificationChannel channel = mgr.getNotificationChannel(options.getChannel());
 
-        if (channel != null)
-            return;
+        if (channel != null) {
+            channel = null;
+            mgr.deleteNotificationChannel(options.getChannel());
+        }
 
         switch (options.getPrio()) {
             case PRIORITY_MIN:
@@ -149,28 +156,26 @@ public final class Manager {
 
         channel = new NotificationChannel(
                 options.getChannel(), options.getChannelDescription(), importance);
-		if(!options.isSilent() && importance > IMPORTANCE_DEFAULT) channel.setBypassDnd(true);
-		if(!options.isWithoutLights()) channel.enableLights(true);
-		if(options.isWithVibration()) {
-			channel.enableVibration(true);
-		} else {
-			channel.setVibrationPattern(new long[]{ 0 });
-			channel.enableVibration(true);
-		}
-		channel.setLightColor(options.getLedColor());
+        if(!options.isSilent() && importance > IMPORTANCE_DEFAULT) channel.setBypassDnd(true);
+        if(!options.isWithoutLights()) channel.enableLights(true);
+        if(options.isWithVibration()) {
+            channel.enableVibration(true);
+        } else {
+            channel.setVibrationPattern(new long[]{ 0 });
+            channel.enableVibration(true);
+        }
+        channel.setLightColor(options.getLedColor());
         if(options.isWithoutSound()) {
-			channel.setSound(null, null);
-		} else {
-			AudioAttributes audioAttributes = new AudioAttributes.Builder()
+            channel.setSound(null, null);
+        } else {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION).build();
-			
-			if(options.isWithDefaultSound()) {
-				channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes);
-			} else {
-				channel.setSound(options.getSound(), audioAttributes);
-			}
-		}
+
+            SharedPreferences sharedpreferences = this.context.getSharedPreferences("ADHAN", Context.MODE_PRIVATE);
+            String sound = sharedpreferences.getString("sound", "file://assets/audio/adhan_makkah.wav");
+            channel.setSound(assets.parse(sound), audioAttributes);
+        }
 
         mgr.createNotificationChannel(channel);
     }
