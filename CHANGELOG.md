@@ -1,5 +1,7 @@
 Changelog
 ---------
+#### Version 0.9.4 (27.11.2020)
+- Add namespace to provider authority to prevent crashes on Android.
 
 #### Version 0.9.3 (09.05.2019)
 - Add namespace to provider authority to prevent crashes on Android.
