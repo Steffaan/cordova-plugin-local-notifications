@@ -39,6 +39,12 @@ __Known issues__
 
 Please report bugs or missing features!
 
+## Installation
+
+To install the latest version:
+
+    $ cordova plugin add https://github.com/hamzayanni/cordova-plugin-local-notifications.git
+
 
 ## Basics
 
@@ -513,14 +519,6 @@ See the sample app for how to use them.
 | clear    | requestPermission | getIds          | getScheduled   | getDefaults   |
 | clearAll | isPresent         | getScheduledIds | getTriggered   | setDefaults   |
 | cancel   | isScheduled       | getTriggeredIds | addActions     | on            |
-
-
-## Installation
-
-To install the latest version:
-
-    $ cordova plugin add https://github.com/Steffaan/cordova-plugin-local-notifications.git
-
 
 ## License
 
